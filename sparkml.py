@@ -45,7 +45,7 @@ data = [
 def write_to_hbase_partition(partition):
     connection = happybase.Connection('master')
     connection.open()
-    table = connection.table('calls')  # Update table name
+    table = connection.table('call_stats')  # Update table name
     for row in partition:
         row_key, column, value = row
         table.put(row_key, {column: value})

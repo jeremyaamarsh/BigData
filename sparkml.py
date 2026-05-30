@@ -43,6 +43,10 @@ data = [
 
 # Function to write data to HBase inside each partition
 def write_to_hbase_partition(partition):
+    rows = list(partition)
+    if not rows:
+        return  # <-- prevents hanging
+    
     connection = happybase.Connection('master')
     connection.open()
     table = connection.table('call_stats')  # Update table name

@@ -4,7 +4,7 @@ from pyspark.ml.regression import LinearRegression
 import happybase
 
 # Step 1: Create a Spark session
-spark = SparkSession.builder.appName("MLlib CallsML Prediction").enableHiveSupport().getOrCreate()
+spark = SparkSession.builder.appName("MLlib_CallsML_Prediction").enableHiveSupport().getOrCreate()
 
 # Step 2: Load the data from the Hive table 'calls' into a Spark DataFrame
 calls_df = spark.sql("SELECT CAST(FLOOR(DATEDIFF(CURRENT_DATE, HireDate) / 365) AS INT) AS yearsExperience, CAST(calls AS INT) AS Calls FROM calls")
@@ -37,15 +37,12 @@ print(f"R^2: {test_results.r2}")
 # ---- Write metrics to HBase with happybase (using the provided pattern) ----
 # Example data (row_key, column_family:column, value) populated with the metrics
 data = [
-    ('metrics1', 'cf:rmse', str(test_results.rootMeanSquaredError)),
-    ('metrics1', 'cf:r2',   str(test_results.r2)),
+    ('metrics1', 'call_data:rmse', str(test_results.rootMeanSquaredError)),
+    ('metrics1', 'call_data:r2',   str(test_results.r2)),
 ]
 
 # Function to write data to HBase inside each partition
-def write_to_hbase_partition(partition):
-    rows = list(partition)
-    if not rows:
-        return  # <-- prevents hanging
+def write_to_hbase_partition(partition):  
     
     connection = happybase.Connection('master')
     connection.open()
